@@ -21,12 +21,12 @@
 
 ---------
 
-### ⭐ Activa En Cloud Starlights
+### ⭐ Activa En Joan-TK Host
 
-<a href="https://dash.starlights.uk"><img src="https://i.ibb.co/37T9Nnk/file.jpg" width="300" height="300" alt="Cloud Starlights"/></a>
+<a href="dash.tk-joanhost.com/login"><img src="https://i.ibb.co/37T9Nnk/file.jpg" width="300" height="300" alt="Cloud Starlights"/></a>
 
-- Dash: [dash.starlights.uk](https://dash.starlights.uk)
-- Panel: [cloud.starlights.uk](https://cloud.starlights.uk/)
+- Dash: [dash.tk-joanhost.com](dash.tk-joanhost.com/login)
+- Panel: [panel.tk-joanhost.com](https://panel.tk-joanhost.com)
 - Canal de WhatsApp: [【 ✯ Starlights Team - Oficial Chanel ✰ 】](https://whatsapp.com/channel/0029Vak9Hmd1iUxdfDUdCK1w)
 
 [![Click Aquí](https://img.shields.io/badge/Soporte-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/595976230899)
