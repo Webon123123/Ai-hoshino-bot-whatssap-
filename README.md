@@ -79,8 +79,8 @@
 
 ---------
 <div align="center">
-  <h1 align="center">Editor y Propietaria de la Bot</h1>
+  <h1 align="center">Editora y Propietaria de la Bot</h1>
 
 <a href="https://atom.bio/masha_ofc"><img src="https://github.com/AikerDev.png" width="300" height="300" alt="masha_ofc"/></a>
 
-`© Ai Hoshino - MD / Starlights Team _ By masha_ofc`
+`© Ai Hoshino - MD / Starlights Team _ By Masha_ofc`
