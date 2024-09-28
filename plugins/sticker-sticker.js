@@ -6,11 +6,7 @@ let handler = async (m, { conn, args }) => {
 
   try {
 
-    // Si hay un video o GIF en el mensaje citado
-
     if (m.quoted && m.quoted.mimetype && (/image|video|gif/.test(m.quoted.mimetype))) {
-
-      // Comprobar si el tipo es video y la duración se pasa de 10 segundos
 
       if (/video/.test(m.quoted.mimetype)) {
 
@@ -24,9 +20,8 @@ let handler = async (m, { conn, args }) => {
 
       img = await m.quoted.download()
 
-    }
 
-    // Si el primer argumento es una URL válida
+    
 
     else if (/^https?:\/\//.test(args[0])) {
 
@@ -38,15 +33,12 @@ let handler = async (m, { conn, args }) => {
 
     } 
 
-    // Si no hay ni imagen, GIF ni video
-
     else {
 
       throw new Error('Por favor, responde a una imagen, GIF o video válido de menos de 10 segundos.')
 
     }
-
-    // Llamar a la función sticker para generar el sticker
+    
 
     let stickerBuffer = await sticker(
 
@@ -59,8 +51,6 @@ let handler = async (m, { conn, args }) => {
       global.stickerAuthor || '𓆩 atom.bio/masha_ofc 𓆪'
 
     )
-
-    // Si se genera el sticker correctamente
 
     if (stickerBuffer) {
 
