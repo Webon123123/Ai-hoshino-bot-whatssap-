@@ -1,7 +1,7 @@
 {
   "users": {
     "595976230899@s.whatsapp.net": {
-      "exp": 6574,
+      "exp": 88773766,
       "limit": 457,
       "registered": true,
       "name": "Maria",
@@ -11,8 +11,8 @@
       "afkReason": "",
       "banned": false,
       "useDocument": true,
-      "bank": 475,
-      "level": 22,
+      "bank": 99999,
+      "level": 900,
       "premium": false,
       "premiumTime": 0
     },
