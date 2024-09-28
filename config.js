@@ -34,7 +34,7 @@ global.catalogo = fs.readFileSync('./storage/img/catalogo.png')
 global.miniurl = fs.readFileSync('./storage/img/miniurl.jpg')
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
-
+global.pagina = 'atom.bio/masha_ofc'
 global.group = ''
 global.canal = 'https://whatsapp.com/channel/0029Vak9Hmd1iUxdfDUdCK1w'
 
