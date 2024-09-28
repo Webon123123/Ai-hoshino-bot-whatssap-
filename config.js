@@ -24,7 +24,7 @@ global.packname = ``
 global.author = '{\n "bot": {\n   "name": "Ai Hoshino",\n     "author": "atom.bio/masha_ofc",\n   "status_bot": "active"\n }\n}'
 global.wait = '🐢 *Aɢᴜᴀʀᴅᴇ ᴜɴ ᴍᴏᴍᴇɴᴛᴏ, sᴏʏ ʟᴇɴᴛᴀ... ฅ^•ﻌ•^ฅ*'
 global.botname = '✯ Ai Hoshino - MD ✰'
-global.textbot = `Powered By Starlights Team`
+global.textbot = `Masha_OFC`
 global.listo = '*Aqui tiene ฅ^•ﻌ•^ฅ*'
 global.namechannel = '【 ✯ Oficial Chanel ✰ 】'
 
