@@ -23,7 +23,7 @@
 
 ### ⭐ Activa En Joan-TK Host
 
-<a href="dash.tk-joanhost.com/login"><img src="https://images.app.goo.gl/tgH49FVqvvNEyTsY7" width="300" height="300" alt="Cloud Starlights"/></a>
+<a href="dash.tk-joanhost.com"><img src="https://images.app.goo.gl/tgH49FVqvvNEyTsY7" width="300" height="300" alt="Tk Host"/></a>
 
 - Dash: [dash.tk-joanhost.com](dash.tk-joanhost.com/login)
 - Panel: [panel.tk-joanhost.com](https://panel.tk-joanhost.com)
