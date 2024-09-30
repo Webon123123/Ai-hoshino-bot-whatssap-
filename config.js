@@ -27,6 +27,15 @@ global.botname = '✯ Ai Hoshino - MD ✰'
 global.textbot = `Masha_OFC`
 global.listo = '*Aqui tiene ฅ^•ﻌ•^ฅ*'
 global.namechannel = '【 ✯ Oficial Chanel ✰ 】'
+global.support = {
+  ffmpeg: true, // Aquí aseguramos que ffmpeg está habilitado
+  ffprobe: true,
+  ffmpegWebp: true,
+  convert: true,
+  magick: false,
+  gm: false,
+  find: false
+}
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
