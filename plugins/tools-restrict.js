@@ -6,7 +6,7 @@ let handler = async (m, { conn, args, command, participants }) => {
 
         return conn.sendMessage(m.chat, {
 
-            text: `🚨 *Atención:* 🚨\n\nParece que has olvidado mencionar a un usuario para aplicar o eliminar una advertencia. Recuerda que es crucial seguir las reglas del grupo para garantizar una buena convivencia. Para advertir a alguien, asegúrate de usar el comando de forma correcta. Ejemplo: *.warn @usuario [razón]*.\n\nTu colaboración hace del grupo un lugar mejor para todos. ¡Gracias!`,
+            text: `🚨 *Atención:* 🚨\n\nParece que has olvidado mencionar a un usuario para aplicar, eliminar una advertencia o ver la lista de advertidos .`,
 
         });
 
