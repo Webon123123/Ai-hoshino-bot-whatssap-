@@ -23,7 +23,7 @@ let handler = async (m, { conn, args }) => {
 
     
 
-    else if (/^https?:\/\//.test(args[0])) {
+    }  else if (/^https?:\/\//.test(args[0])) {
 
       const res = await fetch(args[0])
 
