@@ -1,6 +1,6 @@
 import { addExif } from '../lib/sticker.js'
 let handler = async (m, { conn, text }) => {
-  if (!m.quoted) return conn.reply(m.chat, `🚩 Responde a a un *Sticker.*`, m, rcanal)
+  if (!m.quoted) return conn.reply(m.chat, `🚩 Responde a a un *Sticker.*`, m)
   let stiker = false
   try {
     let [packname, ...author] = text.split('|')
