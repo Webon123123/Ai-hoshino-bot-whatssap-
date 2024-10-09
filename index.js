@@ -20,7 +20,7 @@ say('Ai Hoshino', {
   gradient: ['red', 'magenta']
 })
 
-say(`By Starlights Team`, {
+say(`Proximamente SenkoBot...`, {
   font: 'console',
   align: 'center',
   gradient: ['red', 'magenta']
