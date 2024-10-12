@@ -1,22 +1,21 @@
-import { webp2png } from '../lib/webp2mp4.js'
-let handler = async (m, { conn, usedPrefix, command }) => {
-const notStickerMessage = `🚩 Responde a un *Sticker.*`
-if (!m.quoted) return conn.reply(m.chat, notStickerMessage, m)
-const q = m.quoted || m
-let mime = q.mediaType || ''
-if (!/sticker/.test(mime)) return conn.reply(m.chat, notStickerMessage, m)
-await m.react('🕓')
-try {
-let media = await q.download()
-let out = await webp2png(media).catch(_ => null) || Buffer.alloc(0)
-await conn.sendFile(m.chat, out, 'thumbnail.jpg', listo, m)
-await m.react('✅')
-} catch {
-await m.react('✖️')
-}}
-handler.help = ['toimg *<sticker>*']
-handler.tags = ['sticker', 'tools']
-handler.command = ['toimg', 'jpg', 'aimg'] 
-handler.register = true
+let handler = async (m, { conn, usedPrefix, command, text }) => {
+  try {
+    let q = m.quoted ? m.quoted : m;
+    let mime = (q.msg || q).mimetype || '';
 
-export default handler
+    if (!mime || !/webp/.test(mime)) throw 'Envía o responde a un sticker para convertirlo en imagen.';
+    let sticker = await q.download();
+    if (!sticker) throw 'No se pudo descargar el sticker.';
+    const imageBuffer = Buffer.from(sticker, 'base64');
+    await conn.sendMessage(m.chat, { image: imageBuffer }, { quoted: m });
+  } catch (e) {
+    console.error(e);
+    m.reply(`Ocurrió un error: ${e}`);
+  }
+};
+
+handler.help = ['toimg'].map(v => v + ' (responde a un sticker)');
+handler.tags = ['tools'];
+handler.command = ['toimg']
+
+export default handler;
