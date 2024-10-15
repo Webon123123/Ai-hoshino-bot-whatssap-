@@ -1,8 +1,11 @@
-let handler = async (m, { conn, text, participants}) => {
-	
+let handler = async (m, { conn, participants }) => {
+    
     let users = participants.map(u => u.id).filter(v => v !== conn.user.jid)
+    
     if (!m.quoted) return m.reply(`🚩 Responde a un mensaje.`)
-    conn.sendMessage(m.chat, { forward: m.quoted.fakeObj, mentions: users } )
+ let invisibleChar = '\u200B'
+    let message = invisibleChar + m.quoted.text
+    conn.sendMessage(m.chat, { text: message, mentions: users })
 }
 
 handler.help = ['tag']
