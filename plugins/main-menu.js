@@ -159,7 +159,7 @@ let handler = async (m, { conn, usedPrefix: _p, __dirname }) => {
     let pp = 'https://telegra.ph/file/4c3e4b782c82511b3874d.mp4'
     let img = await (await fetch(`https://i.ibb.co/gDjssZH/file.jpg`)).buffer()
     await m.react('⭐')
-    await conn.sendFile(m.chat, img, 'thumbnail.jpg', text.trim(), m)
+    await conn.sendFile(m.chat, img, 'thumbnail.jpg', text.trim(), m, null, rcanal)
   } catch (e) {
     conn.reply(m.chat, '❎ Lo sentimos, el menú tiene un error.', m)
     throw e
