@@ -38,7 +38,6 @@ Este es el menú de comandos disponibles.
   *🔹 Plataforma:* Multi Device
   *🔹 Tiempo Activo:* %muptime
   *🔹 Usuarios Registrados:* %totalreg
-  *🔹 Canal Oficial:* ${canal}
   *🔹 Página Web:* ${pagina}
 ╰════════════════════╯
 
@@ -56,7 +55,7 @@ Este es el menú de comandos disponibles.
   header: '╭──═[ `MENÚ: %category` ]═───╮\n│\n',
   body: '  ➤ %cmd %islimit %isPremium\n',
   footer: '│\n╰─────────────•◈•─────────────╯\n',
-  after: `> 🚩 ${textbot}`,
+  after: `> 🚩 ${textbot}`,rcanal
 }
 
 let handler = async (m, { conn, usedPrefix: _p, __dirname }) => {
