@@ -2,7 +2,7 @@ import { sticker } from '../lib/sticker.js'
 let stickerMeta = {}
 
 let handler = async (m, { conn, args, command }) => {
-  if (command === 'setmeta') {
+  if (command === 'setmeta', 'st', 'setpack') {
   
     const input = args.join(' ') 
     const [name, author] = input.split('|').map(part => part.trim()) 
@@ -19,7 +19,7 @@ let handler = async (m, { conn, args, command }) => {
 
     return conn.reply(m.chat, `✅ *Pack de stickers configurado correctamente.*\n\n*Nombre:* ${name}\n*Autor:* ${author}`, m)
 
-  } else if (command === 's') {
+  } else if (command === 's', 'sticker') {
     let img
     let meta = stickerMeta[m.sender] || {
       name: '★彡[ᴬⁱ ᴴᵒˢʰⁱⁿᵒ - ᴹᴰ]彡★', 
