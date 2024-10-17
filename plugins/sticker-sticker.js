@@ -1,79 +1,71 @@
 import { sticker } from '../lib/sticker.js'
+let stickerMeta = {}
 
-let handler = async (m, { conn, args }) => {
+let handler = async (m, { conn, args, command }) => {
+  if (command === 'setmeta') {
+  
+    const input = args.join(' ') 
+    const [name, author] = input.split('|').map(part => part.trim()) 
 
-  let img
+    if (!name || !author) {
+      return conn.reply(m.chat, '⚠️ *Formato incorrecto.*\n\nDebes proporcionar un nombre y un autor para el pack de stickers.\n\n*Ejemplo:* `.setmeta Ai Hoshino | MD`', m)
+    }
 
-  try {
 
-    if (m.quoted && m.quoted.mimetype && (/image|video|gif/.test(m.quoted.mimetype))) {
+    stickerMeta[m.sender] = {
+      name: name,
+      author: author
+    }
 
-      if (/video/.test(m.quoted.mimetype)) {
+    return conn.reply(m.chat, `✅ *Pack de stickers configurado correctamente.*\n\n*Nombre:* ${name}\n*Autor:* ${author}`, m)
 
-        if (m.quoted.seconds && m.quoted.seconds > 10) {
+  } else if (command === 's') {
+    let img
+    let meta = stickerMeta[m.sender] || {
+      name: '★彡[ᴬⁱ ᴴᵒˢʰⁱⁿᵒ - ᴹᴰ]彡★', 
+      author: '𓆩 atom.bio/masha_ofc 𓆪'
+    }
 
+    try {
+      
+      if (m.quoted && m.quoted.mimetype && (/image|video|gif/.test(m.quoted.mimetype))) {
+        if (/video/.test(m.quoted.mimetype) && m.quoted.seconds && m.quoted.seconds > 10) {
           throw new Error('El video debe ser menor de 10 segundos.')
-
         }
-
+        img = await m.quoted.download()
+      }
+    
+      else if (m.quoted && m.quoted.isViewOnce && m.quoted.mtype === 'imageMessage') {
+        img = await m.quoted.download()
+  
+      else if (/^https?:\/\//.test(args[0])) {
+        const res = await fetch(args[0])
+        if (res.status !== 200) throw new Error('No se pudo descargar la imagen, video o GIF desde la URL.')
+        img = await res.buffer()
+      } else {
+        throw new Error('Por favor, responde a una imagen, GIF o video válido de menos de 10 segundos.')
       }
 
-      img = await m.quoted.download()
+      let stickerBuffer = await sticker(
+        img, 
+        '', 
+        meta.name, 
+        meta.author
+      )
 
-
-    
-
-    }  else if (/^https?:\/\//.test(args[0])) {
-
-      const res = await fetch(args[0])
-
-      if (res.status !== 200) throw new Error('No se pudo descargar la imagen, video o GIF desde la URL.')
-
-      img = await res.buffer()
-
-    } 
-
-    else {
-
-      throw new Error('Por favor, responde a una imagen, GIF o video válido de menos de 10 segundos.')
-
+      if (stickerBuffer) {
+        await conn.sendMessage(m.chat, { sticker: stickerBuffer }, { quoted: m })
+      } else {
+        throw new Error('No se pudo generar el sticker.')
+      }
+    } catch (e) {
+      console.error(e)
+      let errMessage = e.message ? e.message : 'Error al generar el sticker. Intenta nuevamente.'
+      conn.reply(m.chat, `⚠️ ${errMessage}`, m)
     }
-    
-
-    let stickerBuffer = await sticker(
-
-      img, 
-
-      args[0], 
-
-      global.stickerName || '★彡[ᴬⁱ ᴴᵒˢʰⁱⁿᵒ - ᴹᴰ]彡★', 
-
-      global.stickerAuthor || '𓆩 atom.bio/masha_ofc 𓆪'
-
-    )
-
-    if (stickerBuffer) {
-
-      await conn.sendMessage(m.chat, { sticker: stickerBuffer }, { quoted: m })
-
-    } else {
-
-      throw new Error('No se pudo generar el sticker.')
-
-    }
-
-  } catch (e) {
-
-    console.error(e)
-
-    let errMessage = e.message ? e.message : 'Error al generar el sticker. Intenta nuevamente.'
-
-    conn.reply(m.chat, errMessage, m)
-
   }
-
 }
 
-handler.command = /^sticker|s$/i
+handler.command = /^(setstickerpack|setmeta|setstickermeta|sticker|s)$/i
 
 export default handler
