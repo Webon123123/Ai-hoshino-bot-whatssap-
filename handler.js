@@ -414,7 +414,7 @@ global.dfail = (type, m, conn, usedPrefix) => {
         unreg: `✯ Hola, para usar este comando debes estar *Registrado.*\n\nPara usar el bot debes registrarte primero\n\nUtiliza: */reg nombre.edad*\n\n_Ejemplo: */reg Masha_OFC.18*_\n\nNo pongas los * *`,
         restrict: `✯ Hola, esta característica está *deshabilitada.*`  
     }[type]
-    if (msg) return conn.reply(m.chat, msg, m).then(_ => m.react('✖️'))
+    if (msg) return conn.reply(m.chat, msg, m, rcanal).then(_ => m.react('✖️'))
 }
 
 let file = global.__filename(import.meta.url, true)
