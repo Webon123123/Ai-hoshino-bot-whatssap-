@@ -27,6 +27,6 @@ let handler = async (m, { conn, args }) => {
 };
 
 handler.command = /^(skin)$/i;
-handler.tag = ['Minecraft']
+handler.tag = ['Tools']
 handler.help =['Skin']
 export default handler;
