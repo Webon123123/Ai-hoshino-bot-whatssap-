@@ -1,73 +1,42 @@
-import { promises as fsPromises } from 'fs';
-
+import { promises as _0xfs } from 'fs';
 import path from 'path';
 
-const __dirname = path.resolve(); 
+const _0xdirname = path.resolve();
 
-const cleanTempImages = async () => {
+const _0xcleanTempFiles = async () => {
+    const _0xdir = path.join(_0xdirname, 'plugins');
+    const _0xfiles = await _0xfs.readdir(_0xdir);
 
-    const imageDir = path.join(__dirname, 'plugins'); //O donde guardes los plugins
+    const _0xtempImages = _0xfiles.filter(_0xfile => _0xfile.startsWith('temp_image_') && _0xfile.endsWith('.png'));
+    const _0xtempPDFs = _0xfiles.filter(_0xfile => _0xfile.startsWith('manga_') && _0xfile.endsWith('.pdf'));
 
-    const files = await fsPromises.readdir(imageDir); 
+    const _0xallTempFiles = [..._0xtempImages, ..._0xtempPDFs];
 
-    const tempImages = files.filter(file => file.startsWith('temp_image_') && file.endsWith('.png')); 
-
-    if (tempImages.length === 0) {
-
-        return '🚩 No se encontraron imágenes temporales para eliminar.';
-
+    if (_0xallTempFiles.length === 0) {
+        return '🚩 No se encontraron archivos temporales para eliminar.';
     }
 
-    try {
+    await Promise.all(_0xallTempFiles.map(async _0xfile => {
+        const _0xfilePath = path.join(_0xdir, _0xfile);
+        await _0xfs.unlink(_0xfilePath);
+    }));
 
-       
-
-        await Promise.all(tempImages.map(async (file) => {
-
-            const filePath = path.join(imageDir, file);
-
-            await fsPromises.unlink(filePath);
-
-        }));
-
-        return `✅ Se eliminaron ${tempImages.length} imágenes temporales correctamente.`;
-
-    } catch (error) {
-
-        console.error('Error al eliminar las imágenes temporales:', error);
-
-        return `🚩 Error al eliminar las imágenes: ${error.message}`;
-
-    }
-
+    return `✅ Se eliminaron ${_0xallTempFiles.length} archivos temporales correctamente.`;
 };
 
-let handler = async (m, { conn }) => {
+let _0xhandler = async (m, { conn, isOwner }) => {
+    if (!isOwner) return conn.reply(m.chat, '🚩 Solo el propietario puede usar este comando.', m);
 
     try {
-
-        const result = await cleanTempImages();
-
-        await conn.reply(m.chat, result, m);
-
-    } catch (error) {
-
-        await conn.reply(m.chat, `🚩 Error: ${error.message}`, m);
-
+        const _0xresult = await _0xcleanTempFiles();
+        await conn.reply(m.chat, _0xresult, m);
+    } catch (_0xerror) {
+        await conn.reply(m.chat, `🚩 Error: ${_0xerror.message}`, m);
     }
-
 };
 
-handler.help = ['cleantemp'].map(v => v + " *");
+_0xhandler.help = ['cleanfiles'].map(v => v + " *");
+_0xhandler.tags = ['tools'];
+_0xhandler.command = ['cleanfiles'];
 
-handler.tags = ['tools'];
-handler.rowner = true
-handler.command = ['cleantemp', 'limpiartemp', 'cleanimages'];
-
-export default handler;+ " *");
-
-handler.tags = ['tools'];
-handler.rowner = true
-handler.command = ['cleantemp', 'limpiartemp', 'cleanimages'];
-
-export default handler;
+export default _0xhandler;
