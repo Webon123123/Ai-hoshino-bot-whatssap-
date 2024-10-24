@@ -19,7 +19,7 @@ export async function before(m, {conn, participants, groupMetadata}) {
 ║  
 ╚═►`  
     
-await conn.sendAi(m.chat, botname, textbot, bienvenida, img, img, estilo, m, rcanal)
+await conn.sendAi(m.chat, botname, textbot, bienvenida, img, img, estilo)
   }
   
   if (chat.bienvenida && m.messageStubType == 28) {
