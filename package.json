@@ -56,6 +56,7 @@
     "jsdom": "*",
     "lodash": "*",
     "lowdb": "^3.0.0",
+    "megajs": "^1.3.3",
     "moment-timezone": "*",
     "node-gtts": "*",
     "node-webpmux": "*",
