@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+ fetch from 'node-fetch';
 
 import { createWriteStream, promises as fsPromises } from 'fs';
 
