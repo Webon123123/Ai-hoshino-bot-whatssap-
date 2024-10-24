@@ -1,180 +1,101 @@
- fetch from 'node-fetch';
+import fetch from 'node-fetch';
 
-import { createWriteStream, promises as fsPromises } from 'fs';
+let _0x1a2b = async (_0x1b2c, { conn: _0x2b3d, args: _0x4a5e }) => {
 
-import PDFDocument from 'pdfkit';
+    if (!_0x4a5e.join(' ')) return _0x2b3d.reply(_0x1b2c.chat, '🚩 Por favor, ingresa el nombre del manga que deseas buscar.', _0x1b2c);
 
-import path from 'path';
+    const _0x5f6a = _0x4a5e.join(' ');
 
-const downloadImage = async (url) => {
-
-    const response = await fetch(url);
-
-    if (!response.ok) throw new Error(`No se pudo descargar la imagen: ${url}`);
-
-    const buffer = await response.buffer();
-
-    const filename = path.basename(url); 
-
-    const filepath = `./images/${filename}`; 
-    await fsPromises.mkdir(path.dirname(filepath), { recursive: true });
-
-    await fsPromises.writeFile(filepath, buffer); 
-
-    return filepath; 
-
-};
-
-const createPDF = async (imagePaths) => {
-
-    const doc = new PDFDocument();
-
-    const pdfPath = './manga.pdf';
-
-    const writeStream = createWriteStream(pdfPath);
-
-    doc.pipe(writeStream);
-
-    for (const imagePath of imagePaths) {
-
-        doc.addPage();
-
-        doc.image(imagePath, { fit: [500, 700], align: 'center', valign: 'center' });
-
-    }
-
-    doc.end();
-
-    return new Promise((resolve, reject) => {
-
-        writeStream.on('finish', () => {
-
-            resolve(pdfPath);
-
-        });
-
-        writeStream.on('error', reject);
-
-    });
-
-};
-
-let handler = async (m, { conn, args }) => {
-
-    if (!args[0]) return conn.reply(m.chat, '🚩 Por favor, ingresa el ID del manga que deseas descargar.', m);
+    const _0x7a8b = 'https://api.mangadex.org/manga';
 
     
 
-    const mangaId = args[0];
-
-    const apiUrl = `https://api.mangadex.org/manga/${mangaId}/feed`;
-
     try {
 
-        await m.react('🕓');
+        await _0x1b2c.react('🕓');
 
-        const response = await fetch(apiUrl, {
+        const _0x8b9c = await fetch(`${_0x7a8b}?title=${encodeURIComponent(_0x5f6a)}`, {
 
             method: 'GET',
 
-            headers: {
-
-                'Content-Type': 'application/json'
-
-            }
+            headers: { 'Content-Type': 'application/json' }
 
         });
 
+        if (!_0x8b9c.ok) throw new Error('No se pudo obtener información del manga.');
+
+        const _0x9abc = await _0x8b9c.json();
+
+        const _0xb2cd = _0x9abc.data;
+
         
 
-        if (!response.ok) throw new Error('No se pudo obtener información del manga.');
+        if (!_0xb2cd || _0xb2cd.length === 0) return _0x2b3d.reply(_0x1b2c.chat, '🚩 No se encontraron mangas con ese nombre.', _0x1b2c);
 
-        const data = await response.json();
+        
 
-        const chapters = data.data;
+        let _0xcdef = '📚 **Lista de mangas encontrados:**\n\n';
 
-        if (!chapters || chapters.length === 0) return conn.reply(m.chat, '🚩 No se encontraron capítulos para este manga.', m);
+        
 
-        const imagePaths = [];
+        for (const _0xe0f1 of _0xb2cd) {
 
-        for (const chapter of chapters) {
+            const _0xf2f3 = _0xe0f1.id;
 
-            const chapterId = chapter.id;
+            const _0x1234 = _0xe0f1.attributes.title.en || 'Título no disponible';
 
-            const chapterDetailsResponse = await fetch(`https://api.mangadex.org/at-home/server/${chapterId}`);
+            const _0x5678 = _0xe0f1.relationships.find(_0x9a0b => _0x9a0b.type === 'cover_art');
 
-            const chapterDetails = await chapterDetailsResponse.json();
+            const _0x9b9c = _0x5678 && _0x5678.attributes && _0x5678.attributes.fileName 
 
-            if (!chapterDetails.chapter) {
+                ? `https://uploads.mangadex.org/covers/${_0xf2f3}/${_0x5678.attributes.fileName}.256.jpg` 
 
-                console.error(`Detalles del capítulo no encontrados para ID: ${chapterId}`);
+                : 'No disponible';
 
-                continue; 
-
-            }
-
-            const host = chapterDetails.baseUrl;
-
-            const chapterHash = chapterDetails.chapter.hash;
-
-            const images = chapterDetails.chapter.data;
-
-            for (const image of images) {
-
-                const imageUrl = `${host}/data/${chapterHash}/${image}`;
-
-                
-
-                const imagePath = await downloadImage(imageUrl);
-
-                imagePaths.push(imagePath);
-
-            }
+            _0xcdef += `📖 **Título**: ${_0x1234}\n🆔 **ID**: ${_0xf2f3}\n🖼️ **Portada**: ${_0x9b9c}\n\n`;
 
         }
 
-        // Intentar crear y enviar el PDF
+        
 
-        if (imagePaths.length === 0) {
+        _0xcdef += `\n\n✅ **Code:** ${_0x5c6d()}`; 
 
-            return conn.reply(m.chat, '🚩 No se encontraron imágenes para crear el PDF.', m);
+        return _0x2b3d.reply(_0x1b2c.chat, _0xcdef, _0x1b2c);
 
-        }
+    } catch (_0xaaa1) {
 
-        const pdfPath = await createPDF(imagePaths);
+        console.error(_0xaaa1);
 
-        await conn.sendMessage(m.chat, { document: { url: pdfPath }, mimetype: 'application/pdf', fileName: 'manga.pdf' }, { quoted: m });
+        await _0x1b2c.react('✖️');
 
-        await m.react('✅');
-
-    } catch (error) {
-
-        console.error(error);
-
-        await m.react('✖️');
-
-        return conn.reply(m.chat, `🚩 Error: ${error.message}`, m);
+        return _0x2b3d.reply(_0x1b2c.chat, `🚩 Error: ${_0xaaa1.message}`, _0x1b2c);
 
     }
 
 }
 
-handler.help = ['mangadown'].map(v => v + " *<ID del manga>*");
+_0x1a2b.help = ['searchmanga'].map(_0x1c2d => _0x1c2d + " *<Nombre del manga>*");
 
-handler.tags = ['downloader'];
+_0x1a2b.tags = ['search'];
 
-handler.command = ['mangadex'];
+_0x1a2b.command = ['searchmanga'];
 
-export default handler;= ['mangadex'].map(v => v + " *<ID del manga>*");
+export default _0x1a2b;
 
-handler.tags = ['downloader'];
 
-handler.command = ['mangadex', 'mdex'];
 
-export default handler;angadown'].map(v => v + " *<ID del manga>*");
+const _0x5c6d = () => {
 
-handler.tags = ['downloader'];
+    const _0x4e5c = ['CFO ahsaM', 'made by'];
 
-handler.command = ['mangadex'];
+    const _0x12c0 = (index) => {
 
-export default handler;
+        return _0x4e5c[index] || index;
+
+    };
+
+    
+
+    return _0x12c0(1) + ' ' + _0x12c0(0).split('').reverse().join('');
+
+};};
