@@ -1,41 +1,21 @@
-import Starlights from '@StarlightsTeam/Scraper'
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-  if (!text) return conn.reply(m.chat, `\u200B*🚩 Ingrese su petición*\n*🪼 Ejemplo de uso:* ${usedPrefix + command} como follar con peruanos`, m) 
-  await m.react('🥵')
-  try {
-    let { msg } = await Starlights.openAi(text)
-    await conn.reply(m.chat, `\u200B${msg}`, m) 
-  } catch {
-    try {
-      let { result } = await Starlights.ChatGpt(text)
-      await conn.reply(m.chat, `\u200B${result}`, m)
-    } catch {
-      try {
-        let { result } = await Starlights.ChatGptV2(text)
-        await conn.reply(m.chat, `\u200B${result}`, m) 
-      } catch {
-        try {
-          let api = await fetch(`https://apis-starlights-team.koyeb.app/starlight/chatgpt?text=${text}`)
-          let json = await api.json()
+let handler = async (m, { conn, text }) => {
+if (!text) return m.reply('Ingresa un texto para hablar con *Ai hoshino*')
 
-          if (json.result) {
-            await conn.reply(m.chat, `\u200B${json.result}`, m)
-          } else {
-            await m.react('✖️')
-          }
-        } catch {
-          await m.react('✖️')
-        }
-      }
-    }
-  }
-}
+try {
+let prompt = 'Eres un bot llamado ai hoshino creado por Masha, una creadora de bots'
+let api = await fetch(`https://api.ryzendesu.vip/api/ai/llama?text=${text}&prompt=${prompt}&models=llama-3.1-70b-instruct`)//Modelo 2 : llama-3.2-11b-vision-instruct
+let json = await api.json()
+let { result } = json
+m.reply(result.response)
+} catch (error) {
+console.error(error)
+}}
 
-handler.help = ['ai *<petición>*']
+handler.help = ['IA']
 handler.tags = ['tools']
-handler.command = /^(miku|ai|ia|chatgpt|gpt)$/i
-handler.register = true
+handler.command = ['hoshino']
+handler.register = true 
 
 export default handler
