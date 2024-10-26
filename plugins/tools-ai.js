@@ -13,7 +13,7 @@ m.reply(result.response)
 console.error(error)
 }}
 
-handler.help = ['IA']
+handler.help = ['hoshino']
 handler.tags = ['tools']
 handler.command = ['hoshino']
 handler.register = true 
