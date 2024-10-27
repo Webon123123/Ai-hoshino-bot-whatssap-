@@ -411,10 +411,14 @@ global.dfail = (type, m, conn, usedPrefix) => {
         private: `✯ Hola, este comando solo puede ser utilizado en mi Chat *Privado*.`,
         admin: `✯ Hola, este comando solo puede ser utilizado por los *Administradores* del Grupo.`,
         botAdmin: `✯ Hola, la bot debe ser *Administradora* para ejecutar este Comando.`,
-        unreg: `✯ Hola, para usar este comando debes estar *Registrado.*\n\nPara usar el bot debes registrarte primero\n\nUtiliza: */reg nombre.edad*\n\n_Ejemplo: */reg Masha_OFC.18*_\n\nNo pongas los * *`,
+        unreg: `┏━━━━━━━━━━━━━━━━━━━━━━━✨🌸✨━━━━━━━━━━━━━━━━━━━━━━━┓
+   𝑯𝒐𝒍𝒂, 𝒑𝒂𝒓𝒂 𝒖𝒔𝒂𝒓 𝒆𝒔𝒕𝒆 𝒄𝒐𝒎𝒂𝒏𝒅𝒐 𝒅𝒆𝒃𝒆𝒔 𝒆𝒔𝒕𝒂𝒓 𝒓𝒆𝒈𝒊𝒔𝒕𝒓𝒂𝒅𝒐!
+   𝑷𝒂𝒓𝒂 𝒓𝒆𝒈𝒊𝒔𝒕𝒓𝒂𝒓𝒕𝒆 𝒖𝒔𝒂: /𝒓𝒆𝒈 𝒏𝒐𝒎𝒃𝒓𝒆.𝒆𝒅𝒂𝒅
+   𝑬𝒋𝒆𝒎𝒑𝒍𝒐: /𝒓𝒆𝒈 𝑴𝒂𝒔𝒉𝒂𝑶𝑭𝑪.18
+┗━━━━━━━━━━━━━━━━━━━━━━━✨🌸✨━━━━━━━━━━━━━━━━━━━━━━━┛`,
         restrict: `✯ Hola, esta característica está *deshabilitada.*`  
     }[type]
-    if (msg) return conn.reply(m.chat, msg, m).then(_ => m.react('✖️'))
+    if (msg) return conn.reply(m.chat, msg, m, rcanal).then(_ => m.react('✖️'))
 }
 
 let file = global.__filename(import.meta.url, true)
