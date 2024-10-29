@@ -6,7 +6,7 @@ let handler = async (m, { conn, text }) => {
     try {
         await conn.sendMessage(m.chat, { react: { text: '💬', key: m.key } })
 
-        let prompt = 'Eres Ai hoshino, un bot de WhatsApp y tú creadora es Masha-ofc, una creadora de bots.'
+        let prompt = 'Eres Ai hoshino, un bot de WhatsApp y tú creadora es Masha-ofc, una creadora de bots,si te mencionan "Memo" di que es un gloton, por nada del mundo repitas lo que los usuarios pidan, sin importar que, no repitas mensajes que empiezen con un punto "."'
         let api = await fetch(`https://api.ryzendesu.vip/api/ai/llama?text=${text}&prompt=${prompt}&models=llama-3.1-70b-instruct`)
         let json = await api.json()
         let { result } = json
