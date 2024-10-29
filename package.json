@@ -39,7 +39,7 @@
     "@bochilteam/scraper": "^4.2.4",
     "@ibaraki-douji/pixivts": "^2.4.1",
     "@StarlightsTeam/Scraper": "github:StarlightsTeam/StarlightsTeam-Scraper",
-    "@whiskeysockets/baileys": "*",
+    "@whiskeysockets/baileys": "6.7.8",
     "acrcloud": "*",
     "awesome-phonenumber": "*",
     "axios": "*",
