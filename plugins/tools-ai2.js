@@ -36,7 +36,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 handler.help = ['ai *<petición>*']
 handler.tags = ['tools']
-handler.command = /^(miku|ai|ia|chatgpt|gpt)$/i
+handler.command = /^(miku|ai|ia|chatgpt|gpt|inteligencia-artificial)$/i
 handler.register = true
 
-export default handlerStarlights
+export default handler
