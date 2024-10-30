@@ -1,55 +1,55 @@
 import fetch from 'node-fetch';
 const { generateWAMessageContent, generateWAMessageFromContent, proto } = (await import('@whiskeysockets/baileys')).default;
 
-let _0x1a2b3c = async (m, { conn, text }) => {
+let animeSearchHandler = async (m, { conn, text }) => {
     if (!text) {
         return m.reply('🚩 Por favor, ingresa el nombre del anime que deseas buscar.');
     }
 
     try {
-        async function _0x4d5e6f(url) {
-            const _0x7g8h9i = url || 'https://i.ibb.co/hcnfCQS/file.jpg';
-            const { imageMessage } = await generateWAMessageContent({ image: { url: _0x7g8h9i } }, { upload: conn.waUploadToServer });
+        async function createImageMessage(url) {
+            const defaultImageUrl = 'https://i.ibb.co/hcnfCQS/file.jpg';
+            const { imageMessage } = await generateWAMessageContent({ image: { url: url || defaultImageUrl } }, { upload: conn.waUploadToServer });
             return imageMessage;
         }
 
-        let _0x10e11f = [];
-        const _0x12a13b = await fetch(`https://animeflvapi.vercel.app/search?text=${encodeURIComponent(text)}`);
-        const _0x14c15d = await _0x12a13b.json();
+        let resultsArray = [];
+        const response = await fetch(`https://animeflvapi.vercel.app/search?text=${encodeURIComponent(text)}`);
+        const data = await response.json();
 
-        if (!_0x14c15d.results || _0x14c15d.results.length === 0) {
+        if (!data.results || data.results.length === 0) {
             return conn.reply(m.chat, '🚩 No se encontraron animes con ese nombre.', m);
         }
 
-        for (let _0x16e17f of _0x14c15d.results) {
-            const _0x181920 = _0x16e17f.id;
-            const _0x212223 = _0x16e17f.title || 'Título no disponible';
-            const _0x242526 = _0x16e17f.score ? `⭐ **Rating**: ${_0x16e17f.score}` : '⭐ **Rating**: No disponible';
-            const _0x272829 = _0x16e17f.poster || 'https://i.ibb.co/hcnfCQS/file.jpg';
-            const _0x303132 = await _0x4d5e6f(_0x272829);
+        for (let anime of data.results) {
+            const animeId = anime.id;
+            const animeTitle = anime.title || 'Título no disponible';
+            const animeScore = anime.score ? `⭐ **Rating**: ${anime.score}` : '⭐ **Rating**: No disponible';
+            const animePoster = anime.poster || 'https://i.ibb.co/hcnfCQS/file.jpg';
+            const imageMessage = await createImageMessage(animePoster);
 
-            _0x10e11f.push({
+            resultsArray.push({
                 body: proto.Message.InteractiveMessage.Body.fromObject({
-                    text: `✨🌌 **Título**: ${_0x212223}\n💫💖 ${_0x242526} 💖💫`
+                    text: `✨🌌 **Título**: ${animeTitle}\n💫💖 ${animeScore} 💖💫`
                 }),
                 footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                    text: `🆔 **ID**: ${_0x181920}`
+                    text: `🆔 **ID**: ${animeId}`
                 }),
                 header: proto.Message.InteractiveMessage.Header.fromObject({
                     title: '',
                     hasMediaAttachment: true,
-                    imageMessage: _0x303132
+                    imageMessage: imageMessage
                 }),
                 nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
                     buttons: [{
                         name: "cta_copy",
-                        buttonParamsJson: `{"display_text":"Copiar ID","id":"${_0x181920}","copy_code":"${_0x181920}"}`
+                        buttonParamsJson: `{"display_text":"Copiar ID","id":"${animeId}","copy_code":"${animeId}"}`
                     }]
                 })
             });
         }
 
-        const _0x333435 = generateWAMessageFromContent(m.chat, {
+        const message = generateWAMessageFromContent(m.chat, {
             viewOnceMessage: {
                 message: {
                     messageContextInfo: {
@@ -67,14 +67,14 @@ let _0x1a2b3c = async (m, { conn, text }) => {
                             hasMediaAttachment: false
                         }),
                         carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
-                            cards: [..._0x10e11f]
+                            cards: [...resultsArray]
                         })
                     })
                 }
             }
         }, {});
 
-        await conn.relayMessage(m.chat, _0x333435.message, { messageId: _0x333435.key.id });
+        await conn.relayMessage(m.chat, message.message, { messageId: message.key.id });
 
     } catch (error) {
         console.error(error);
@@ -82,7 +82,7 @@ let _0x1a2b3c = async (m, { conn, text }) => {
     }
 };
 
-_handler.help = ["animesearch"];
-_handler.tags = ["search"];
-_handler.command = /^(searchanime|animeflv|animesearch|animeid)$/i;
-export default _0x1a2b3c;
+animeSearchHandler.help = ["animesearch"];
+animeSearchHandler.tags = ["search"];
+animeSearchHandler.command = /^(searchanime|animeflv|animesearch|animeid)$/i;
+export default animeSearchHandler;
