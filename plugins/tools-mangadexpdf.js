@@ -36,6 +36,25 @@ const createPDF = async (images) => {
 };
 
 let handler = async (m, { conn, args }) => {
+    if (args[0] === 'infomanga') {
+        const mangaId = args[1];
+        if (!mangaId) return conn.reply(m.chat, '🚩 Por favor, ingresa el ID del manga que deseas consultar.', m);
+
+        try {
+            const response = await fetch(`https://api.mangadex.org/manga/${mangaId}`);
+            if (!response.ok) throw new Error('No se pudo obtener información del manga.');
+            const { data: mangaData } = await response.json();
+            if (!mangaData) return conn.reply(m.chat, '🚩 No se encontró información para este ID de manga.', m);
+
+            const title = mangaData.attributes.title.en || mangaData.attributes.title.es || mangaData.attributes.title.ja || 'Título no disponible';
+            const availableLanguages = mangaData.attributes.availableTranslatedLanguages.join(', ');
+
+            return conn.reply(m.chat, `📰 **Información del Manga**\n\n**Título:** ${title}\n**Idiomas Disponibles:** ${availableLanguages}`, m);
+        } catch (error) {
+            return conn.reply(m.chat, `🚩 Error: ${error.message}`, m);
+        }
+    }
+
     if (!args[0]) return conn.reply(m.chat, '🚩 Por favor, ingresa el ID del manga que deseas descargar.', m);
     
     const mangaId = args[0];
@@ -44,12 +63,11 @@ let handler = async (m, { conn, args }) => {
 
     try {
         await m.react('🕓');
-        
-        // caps
-        const response = await fetch(`https://api.mangadex.org/manga/${mangaId}/feed?translatedLanguage[]=es`);
+
+        const response = await fetch(`https://api.mangadex.org/manga/${mangaId}/feed`);
         if (!response.ok) throw new Error('No se pudo obtener información del manga.');
         const { data: chapters } = await response.json();
-        if (!chapters || chapters.length === 0) return conn.reply(m.chat, '🚩 No se encontraron capítulos en español para este manga.', m);
+        if (!chapters || chapters.length === 0) return conn.reply(m.chat, '🚩 No se encontraron capítulos para este manga.', m);
         
         const images = [];
         
@@ -83,10 +101,10 @@ let handler = async (m, { conn, args }) => {
     }
 };
 
-handler.help = ["mangadex <ID del manga> <tomo> <capítulo>"];
+handler.help = ["mangadex <ID del manga> [tomo] [capítulo]", "infomanga <ID del manga>"];
 handler.tags = ['tools'];
-handler.command = /^(mangadex)$/i;
+handler.command = /^(mangadex|infomanga)$/i;
 
 export default handler;
 
-console.log("Created by Masha_OFC");
+console.log("Creado por Masha_OFC"); yo
