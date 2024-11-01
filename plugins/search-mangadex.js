@@ -16,17 +16,16 @@ let handler = async (m, { conn, text }) => {
 
         let [language, ...mangaNameParts] = text.split("|").map(part => part.trim());
         let mangaName = mangaNameParts.join(" ");
-        let languageCode;
+        let languageCode = null;
 
-        if (language.toLowerCase() === 'español') {
-            languageCode = 'es';
-        } else if (language.toLowerCase() === 'inglés') {
-            languageCode = 'en';
-        } else if (language.toLowerCase() === 'japonés') {
-            languageCode = 'ja';
-        } else if (mangaName) {
-            mangaName = text;
-            languageCode = null;
+        if (language) {
+            if (language.toLowerCase() === 'español') {
+                languageCode = 'es';
+            } else if (language.toLowerCase() === 'inglés') {
+                languageCode = 'en';
+            } else if (language.toLowerCase() === 'japonés') {
+                languageCode = 'ja';
+            }
         }
 
         let messages = [];
