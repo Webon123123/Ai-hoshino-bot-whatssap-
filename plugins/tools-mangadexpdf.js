@@ -21,7 +21,7 @@ const downloadImage = async (url, filename) => {
 };
 
 const createPDF = async (images) => {
-    const pdfPath = path.join(__dirname, `manga_complete.pdf`);
+    const pdfPath = path.join(__dirname, `manga_part.pdf`);
     const doc = new PDFDocument();
     const stream = createWriteStream(pdfPath);
     doc.pipe(stream);
@@ -68,10 +68,17 @@ let handler = async (m, { conn, args }) => {
 
         if (images.length === 0) return conn.reply(m.chat, '🚩 No se encontraron imágenes en los capítulos seleccionados.', m);
         
-        const pdfPath = await createPDF(images);
-        await conn.sendMessage(m.chat, { document: { url: pdfPath }, mimetype: 'application/pdf', fileName: `manga_complete.pdf` }, { quoted: m });
+        const totalImages = images.length;
+        const parts = Math.ceil(totalImages / 80);
         
-        await Promise.all(images.map(async (img) => await fsPromises.unlink(img))); // Eliminar imágenes temporales
+        for (let part = 0; part < parts; part++) {
+            const imageSlice = images.slice(part * 80, (part + 1) * 80);
+            const pdfPath = await createPDF(imageSlice);
+            await conn.sendMessage(m.chat, { document: { url: pdfPath }, mimetype: 'application/pdf', fileName: `manga_part_${part + 1}.pdf` }, { quoted: m });
+
+            await Promise.all(imageSlice.map(async (img) => await fsPromises.unlink(img))); // Eliminar imágenes temporales
+        }
+        
         await m.react('✅');
     } catch (error) {
         await m.react('✖️');
