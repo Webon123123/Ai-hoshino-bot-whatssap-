@@ -1,1 +1,93 @@
-import fetch from 'node-fetch';const{generateWAMessageContent,generateWAMessageFromContent,proto}=(await import('@whiskeysockets/baileys')).default;let handler=async(m,{conn,text})=>{if(!text)return m.reply('🚩 Por favor, ingresa el nombre del manga que deseas buscar.');try{async function createImage(url){const imageUrl=url||'https://i.ibb.co/NCjGCJB/file.jpg';const{imageMessage}=await generateWAMessageContent({image:{url:imageUrl}},{upload:conn.waUploadToServer});return imageMessage;}let push=[];const api=await fetch(`https://api.mangadex.org/manga/?title=${encodeURIComponent(text)}`);const json=await api.json();if(!json.data||json.data.length===0)return conn.reply(m.chat,'🚩 No se encontraron mangas con ese nombre.',m);for(let manga of json.data){const mangaId=manga.id;const mangaTitle=manga.attributes.title.en||'Título no disponible';const coverArt=manga.relationships.find(rel=>rel.type==='cover_art');const coverUrl=coverArt&&coverArt.attributes&&coverArt.attributes.fileName?`https://uploads.mangadex.org/covers/${mangaId}/${coverArt.attributes.fileName}.256.jpg`:null;const image=await createImage(coverUrl);push.push({body:proto.Message.InteractiveMessage.Body.fromObject({text:`📖 **Título**: ${mangaTitle}`}),footer:proto.Message.InteractiveMessage.Footer.fromObject({text:`🆔 **ID**: ${mangaId}`}),header:proto.Message.InteractiveMessage.Header.fromObject({title:'',hasMediaAttachment:true,imageMessage:image}),nativeFlowMessage:proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({buttons:[{name:"cta_copy",buttonParamsJson:`{"display_text":"Copiar ID","id":"${mangaId}","copy_code":"${mangaId}"}`}]})});}const msg=generateWAMessageFromContent(m.chat,{viewOnceMessage:{message:{messageContextInfo:{deviceListMetadata:{},deviceListMetadataVersion:2},interactiveMessage:proto.Message.InteractiveMessage.fromObject({body:proto.Message.InteractiveMessage.Body.create({text:`Resultados para: ${text}`}),footer:proto.Message.InteractiveMessage.Footer.create({text:'✨🌌 ¡Explora el mundo del manga! 🌌✨'}),header:proto.Message.InteractiveMessage.Header.create({hasMediaAttachment:false}),carouselMessage:proto.Message.InteractiveMessage.CarouselMessage.fromObject({cards:[...push]})})}}},},{});await conn.relayMessage(m.chat,msg.message,{messageId:msg.key.id});}catch(error){console.error(error);return conn.reply(m.chat,`🚩 Error: ${error.message}`,m);}var _0x1fef=["\x69\x6D\x70\x6F\x72\x74","\x66\x65\x74\x63\x68","\x68\x74\x74\x70\x73\x3A\x2F\x2F\x69\x2E\x69\x62\x62\x2E\x63\x6F\x2F\x4E\x43\x6A\x47\x43\x4A\x42\x2F\x66\x69\x6C\x65\x2E\x6A\x70\x67","\x67\x65\x74","\x72\x65\x6C\x61\x79\x4D\x65\x73\x73\x61\x67\x65"];console[_0x1fef[4]](_0x1fef[3])}handler.help=["mangaid"];handler.tags=["search"];handler.command=/^(searchmanga|mangaid|mangadexid|mangasearch|buscarmanga)$/i;export default handler;var _0x1fef=["\x43\x72\x65\x61\x74\x65\x64\x20\x62\x79\x20\x4D\x61\x73\x68\x61\x5F\x4F\x46\x43","\x68\x65\x6C\x70"];console[_0x1fef[1]](_0x1fef[0]);
+import fetch from 'node-fetch';
+const { generateWAMessageContent, generateWAMessageFromContent, proto } = (await import('@whiskeysockets/baileys')).default;
+
+let handler = async (m, { conn, text }) => {
+    if (!text) return m.reply('🚩 Por favor, ingresa el nombre del manga que deseas buscar.');
+    
+    try {
+        async function createImage(url) {
+            const imageUrl = url || 'https://i.ibb.co/NCjGCJB/file.jpg';
+            const { imageMessage } = await generateWAMessageContent(
+                { image: { url: imageUrl } },
+                { upload: conn.waUploadToServer }
+            );
+            return imageMessage;
+        }
+
+        let messages = [];
+        const apiResponse = await fetch(`https://api.mangadex.org/manga/?title=${encodeURIComponent(text)}`);
+        const jsonData = await apiResponse.json();
+
+        if (!jsonData.data || jsonData.data.length === 0) {
+            return conn.reply(m.chat, '🚩 No se encontraron mangas con ese nombre.', m);
+        }
+
+        for (let manga of jsonData.data) {
+            const mangaId = manga.id;
+            const mangaTitle = manga.attributes.title.en || 'Título no disponible';
+            const coverArt = manga.relationships.find(rel => rel.type === 'cover_art');
+            const coverUrl = coverArt && coverArt.attributes && coverArt.attributes.fileName
+                ? `https://uploads.mangadex.org/covers/${mangaId}/${coverArt.attributes.fileName}.256.jpg`
+                : null;
+
+            const image = await createImage(coverUrl);
+            messages.push({
+                body: proto.Message.InteractiveMessage.Body.fromObject({
+                    text: `📖 **Título**: ${mangaTitle}`
+                }),
+                footer: proto.Message.InteractiveMessage.Footer.fromObject({
+                    text: `🆔 **ID**: ${mangaId}`
+                }),
+                header: proto.Message.InteractiveMessage.Header.fromObject({
+                    title: '',
+                    hasMediaAttachment: true,
+                    imageMessage: image
+                }),
+                nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+                    buttons: [{
+                        name: "cta_copy",
+                        buttonParamsJson: `{"display_text":"Copiar ID","id":"${mangaId}","copy_code":"${mangaId}"}` 
+                    }]
+                })
+            });
+        }
+
+        const messageContent = generateWAMessageFromContent(m.chat, {
+            viewOnceMessage: {
+                message: {
+                    messageContextInfo: {
+                        deviceListMetadata: {},
+                        deviceListMetadataVersion: 2
+                    },
+                    interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+                        body: proto.Message.InteractiveMessage.Body.create({
+                            text: `Resultados para: ${text}`
+                        }),
+                        footer: proto.Message.InteractiveMessage.Footer.create({
+                            text: '✨🌌 ¡Explora el mundo del manga! 🌌✨'
+                        }),
+                        header: proto.Message.InteractiveMessage.Header.create({
+                            hasMediaAttachment: false
+                        }),
+                        carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
+                            cards: [...messages]
+                        })
+                    })
+                }
+            }
+        }, {});
+
+        await conn.relayMessage(m.chat, messageContent.message, { messageId: messageContent.key.id });
+    } catch (error) {
+        console.error(error);
+        return conn.reply(m.chat, `🚩 Error: ${error.message}`, m);
+    }
+};
+
+handler.help = ["mangaid"];
+handler.tags = ["search"];
+handler.command = /^(searchmanga|mangaid|mangadexid|mangasearch|buscarmanga)$/i;
+
+export default handler;
+
+console.log("Created by Masha_OFC");
