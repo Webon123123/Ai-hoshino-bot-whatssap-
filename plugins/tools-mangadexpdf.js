@@ -53,16 +53,20 @@ let handler = async (m, { conn, args }) => {
         
         for (const chapter of chapters) {
             const { id: chapterId } = chapter;
+            try {
+                const imageResponse = await fetch(`https://api.mangadex.org/at-home/server/${chapterId}`);
+                const imageData = await imageResponse.json();
+                if (!imageData.chapter) continue;
 
-            const imageResponse = await fetch(`https://api.mangadex.org/at-home/server/${chapterId}`);
-            const imageData = await imageResponse.json();
-            if (!imageData.chapter) continue;
-
-            const { baseUrl, chapter: { hash, data } } = imageData;
-            for (const filename of data) {
-                const imageUrl = `${baseUrl}/data/${hash}/${filename}`;
-                const imagePath = await downloadImage(imageUrl, filename);
-                images.push(imagePath);
+                const { baseUrl, chapter: { hash, data } } = imageData;
+                for (const filename of data) {
+                    const imageUrl = `${baseUrl}/data/${hash}/${filename}`;
+                    const imagePath = await downloadImage(imageUrl, filename);
+                    images.push(imagePath);
+                }
+            } catch (error) {
+                await conn.reply(m.chat, `🚩 Error al procesar el capítulo ${chapterId}: ${error.message}`, m);
+                continue;
             }
         }
 
@@ -76,7 +80,7 @@ let handler = async (m, { conn, args }) => {
             const pdfPath = await createPDF(imageSlice);
             await conn.sendMessage(m.chat, { document: { url: pdfPath }, mimetype: 'application/pdf', fileName: `manga_part_${part + 1}.pdf` }, { quoted: m });
 
-            await Promise.all(imageSlice.map(async (img) => await fsPromises.unlink(img))); // Eliminar imágenes temporales
+            await Promise.all(imageSlice.map(async (img) => await fsPromises.unlink(img)));
         }
         
         await m.react('✅');
