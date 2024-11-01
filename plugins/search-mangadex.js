@@ -2,20 +2,9 @@ import fetch from 'node-fetch';
 const { generateWAMessageContent, generateWAMessageFromContent, proto } = (await import('@whiskeysockets/baileys')).default;
 
 let handler = async (m, { conn, text }) => {
-    if (!text) return m.reply('🚩 Por favor, ingresa el nombre del manga que deseas buscar, por ejemplo: ".mangaid komi san" o ".mangaid español | komi san".');
-
+    if (!text) return m.reply('🚩 Por favor, ingresa el nombre del manga que deseas buscar.');
+    
     try {
-        let languageCode = 'es';
-        let mangaTitle;
-
-        if (text.includes('|')) {
-            let [lang, ...titleParts] = text.split('|').map(str => str.trim());
-            mangaTitle = titleParts.join(' ');
-            languageCode = lang.toLowerCase();
-        } else {
-            mangaTitle = text.trim();
-        }
-
         async function createImage(url) {
             const imageUrl = url || 'https://i.ibb.co/NCjGCJB/file.jpg';
             const { imageMessage } = await generateWAMessageContent(
@@ -25,17 +14,35 @@ let handler = async (m, { conn, text }) => {
             return imageMessage;
         }
 
+        let [language, ...mangaNameParts] = text.split("|").map(part => part.trim());
+        let mangaName = mangaNameParts.join(" ");
+        let languageCode;
+
+        if (language.toLowerCase() === 'español') {
+            languageCode = 'es';
+        } else if (language.toLowerCase() === 'inglés') {
+            languageCode = 'en';
+        } else if (language.toLowerCase() === 'japonés') {
+            languageCode = 'ja';
+        } else if (mangaName) {
+            mangaName = text;
+            languageCode = null;
+        }
+
         let messages = [];
-        const apiResponse = await fetch(`https://api.mangadex.org/manga/?title=${encodeURIComponent(mangaTitle)}&translatedLanguage[]=${languageCode}`);
+        const apiUrl = `https://api.mangadex.org/manga/?title=${encodeURIComponent(mangaName)}` +
+            (languageCode ? `&translatedLanguage[]=${languageCode}` : '');
+
+        const apiResponse = await fetch(apiUrl);
         const jsonData = await apiResponse.json();
 
         if (!jsonData.data || jsonData.data.length === 0) {
-            return conn.reply(m.chat, '🚩 No se encontraron mangas en el idioma seleccionado con ese nombre.', m);
+            return conn.reply(m.chat, '🚩 No se encontraron mangas con ese nombre.', m);
         }
 
         for (let manga of jsonData.data) {
             const mangaId = manga.id;
-            const title = manga.attributes.title[languageCode] || manga.attributes.title.en || 'Título no disponible';
+            const mangaTitle = manga.attributes.title[languageCode] || manga.attributes.title.en || 'Título no disponible';
             const coverArt = manga.relationships.find(rel => rel.type === 'cover_art');
             const coverUrl = coverArt && coverArt.attributes && coverArt.attributes.fileName
                 ? `https://uploads.mangadex.org/covers/${mangaId}/${coverArt.attributes.fileName}.256.jpg`
@@ -44,7 +51,7 @@ let handler = async (m, { conn, text }) => {
             const image = await createImage(coverUrl);
             messages.push({
                 body: proto.Message.InteractiveMessage.Body.fromObject({
-                    text: `📖 **Título**: ${title}`
+                    text: `📖 **Título**: ${mangaTitle}`
                 }),
                 footer: proto.Message.InteractiveMessage.Footer.fromObject({
                     text: `🆔 **ID**: ${mangaId}`
@@ -72,7 +79,7 @@ let handler = async (m, { conn, text }) => {
                     },
                     interactiveMessage: proto.Message.InteractiveMessage.fromObject({
                         body: proto.Message.InteractiveMessage.Body.create({
-                            text: `Resultados para: ${mangaTitle}`
+                            text: `Resultados para: ${mangaName}`
                         }),
                         footer: proto.Message.InteractiveMessage.Footer.create({
                             text: '✨🌌 ¡Explora el mundo del manga! 🌌✨'
