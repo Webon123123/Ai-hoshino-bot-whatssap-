@@ -36,35 +36,15 @@ const createPDF = async (images) => {
 };
 
 let handler = async (m, { conn, args }) => {
-    if (args[0] === 'infomanga') {
-        const mangaId = args[1];
-        if (!mangaId) return conn.reply(m.chat, '🚩 Por favor, ingresa el ID del manga que deseas consultar.', m);
-
-        try {
-            const response = await fetch(`https://api.mangadex.org/manga/${mangaId}`);
-            if (!response.ok) throw new Error('No se pudo obtener información del manga.');
-            const { data: mangaData } = await response.json();
-            if (!mangaData) return conn.reply(m.chat, '🚩 No se encontró información para este ID de manga.', m);
-
-            const title = mangaData.attributes.title.en || mangaData.attributes.title.es || mangaData.attributes.title.ja || 'Título no disponible';
-            const availableLanguages = mangaData.attributes.availableTranslatedLanguages.join(', ');
-
-            return conn.reply(m.chat, `📰 **Información del Manga**\n\n**Título:** ${title}\n**Idiomas Disponibles:** ${availableLanguages}`, m);
-        } catch (error) {
-            return conn.reply(m.chat, `🚩 Error: ${error.message}`, m);
-        }
-    }
-
     if (!args[0]) return conn.reply(m.chat, '🚩 Por favor, ingresa el ID del manga que deseas descargar.', m);
     
     const mangaId = args[0];
-    const chapterQuery = args[1] ? args[1].toLowerCase() : '';
-    const volumeQuery = args[2] ? args[2].toLowerCase() : '';
+    const langQuery = args[1] === 'es' ? 'translatedLanguage[]=es' : '';
 
     try {
         await m.react('🕓');
 
-        const response = await fetch(`https://api.mangadex.org/manga/${mangaId}/feed`);
+        const response = await fetch(`https://api.mangadex.org/manga/${mangaId}/feed?${langQuery}`);
         if (!response.ok) throw new Error('No se pudo obtener información del manga.');
         const { data: chapters } = await response.json();
         if (!chapters || chapters.length === 0) return conn.reply(m.chat, '🚩 No se encontraron capítulos para este manga.', m);
@@ -72,9 +52,7 @@ let handler = async (m, { conn, args }) => {
         const images = [];
         
         for (const chapter of chapters) {
-            const { id: chapterId, attributes: { volume, chapter: chapterNumber } } = chapter;
-
-            if ((volumeQuery && `tomo${volume}` !== volumeQuery) || (chapterQuery && `cap${chapterNumber}` !== chapterQuery)) continue;
+            const { id: chapterId } = chapter;
 
             const imageResponse = await fetch(`https://api.mangadex.org/at-home/server/${chapterId}`);
             const imageData = await imageResponse.json();
@@ -101,10 +79,10 @@ let handler = async (m, { conn, args }) => {
     }
 };
 
-handler.help = ["mangadex <ID del manga> [tomo] [capítulo]", "infomanga <ID del manga>"];
+handler.help = ["mangadex <ID del manga> [es]"];
 handler.tags = ['tools'];
-handler.command = /^(mangadex|infomanga)$/i;
+handler.command = /^(mangadex)$/i;
 
 export default handler;
 
-console.log("Creado por Masha_OFC"); yo
+console.log("Creado por Masha_OFC");
