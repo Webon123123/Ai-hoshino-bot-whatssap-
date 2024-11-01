@@ -3,7 +3,7 @@ const { generateWAMessageContent, generateWAMessageFromContent, proto } = (await
 
 let handler = async (m, { conn, text }) => {
     if (!text) return m.reply('🚩 Por favor, ingresa el nombre del manga que deseas buscar.');
-    
+
     try {
         async function createImage(url) {
             const imageUrl = url || 'https://i.ibb.co/NCjGCJB/file.jpg';
