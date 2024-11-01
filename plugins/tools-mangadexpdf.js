@@ -20,8 +20,8 @@ const downloadImage = async (url, filename) => {
     });
 };
 
-const createPDF = async (images) => {
-    const pdfPath = path.join(__dirname, `manga_part.pdf`);
+const createPDF = async (images, part) => {
+    const pdfPath = path.join(__dirname, `manga_part_${part}.pdf`);
     const doc = new PDFDocument();
     const stream = createWriteStream(pdfPath);
     doc.pipe(stream);
@@ -50,7 +50,8 @@ let handler = async (m, { conn, args }) => {
         if (!chapters || chapters.length === 0) return conn.reply(m.chat, '🚩 No se encontraron capítulos para este manga.', m);
         
         const images = [];
-        
+        let part = 1;
+
         for (const chapter of chapters) {
             const { id: chapterId } = chapter;
             try {
@@ -63,6 +64,14 @@ let handler = async (m, { conn, args }) => {
                     const imageUrl = `${baseUrl}/data/${hash}/${filename}`;
                     const imagePath = await downloadImage(imageUrl, filename);
                     images.push(imagePath);
+                    
+                    if (images.length === 80) {
+                        const pdfPath = await createPDF(images, part);
+                        await conn.sendMessage(m.chat, { document: { url: pdfPath }, mimetype: 'application/pdf', fileName: `manga_part_${part}.pdf` }, { quoted: m });
+                        await Promise.all(images.map(img => fsPromises.unlink(img)));
+                        images.length = 0;
+                        part++;
+                    }
                 }
             } catch (error) {
                 await conn.reply(m.chat, `🚩 Error al procesar el capítulo ${chapterId}: ${error.message}`, m);
@@ -70,17 +79,10 @@ let handler = async (m, { conn, args }) => {
             }
         }
 
-        if (images.length === 0) return conn.reply(m.chat, '🚩 No se encontraron imágenes en los capítulos seleccionados.', m);
-        
-        const totalImages = images.length;
-        const parts = Math.ceil(totalImages / 80);
-        
-        for (let part = 0; part < parts; part++) {
-            const imageSlice = images.slice(part * 80, (part + 1) * 80);
-            const pdfPath = await createPDF(imageSlice);
-            await conn.sendMessage(m.chat, { document: { url: pdfPath }, mimetype: 'application/pdf', fileName: `manga_part_${part + 1}.pdf` }, { quoted: m });
-
-            await Promise.all(imageSlice.map(async (img) => await fsPromises.unlink(img)));
+        if (images.length > 0) {
+            const pdfPath = await createPDF(images, part);
+            await conn.sendMessage(m.chat, { document: { url: pdfPath }, mimetype: 'application/pdf', fileName: `manga_part_${part}.pdf` }, { quoted: m });
+            await Promise.all(images.map(img => fsPromises.unlink(img)));
         }
         
         await m.react('✅');
