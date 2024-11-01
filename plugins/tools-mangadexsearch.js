@@ -15,16 +15,17 @@ let handler = async (m, { conn, text }) => {
         }
 
         let messages = [];
-        const apiResponse = await fetch(`https://api.mangadex.org/manga/?title=${encodeURIComponent(text)}`);
+        // Filtro de idioma en español
+        const apiResponse = await fetch(`https://api.mangadex.org/manga/?title=${encodeURIComponent(text)}&translatedLanguage[]=es`);
         const jsonData = await apiResponse.json();
 
         if (!jsonData.data || jsonData.data.length === 0) {
-            return conn.reply(m.chat, '🚩 No se encontraron mangas con ese nombre.', m);
+            return conn.reply(m.chat, '🚩 No se encontraron mangas en español con ese nombre.', m);
         }
 
         for (let manga of jsonData.data) {
             const mangaId = manga.id;
-            const mangaTitle = manga.attributes.title.en || 'Título no disponible';
+            const mangaTitle = manga.attributes.title.en || manga.attributes.title.es || 'Título no disponible';
             const coverArt = manga.relationships.find(rel => rel.type === 'cover_art');
             const coverUrl = coverArt && coverArt.attributes && coverArt.attributes.fileName
                 ? `https://uploads.mangadex.org/covers/${mangaId}/${coverArt.attributes.fileName}.256.jpg`
