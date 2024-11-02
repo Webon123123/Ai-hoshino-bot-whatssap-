@@ -10,13 +10,13 @@ let handler = async (m, { conn, args }) => {
         if (!response.ok) throw new Error('No se pudo obtener información del servidor.');
         
         const data = await response.json();
-        if (!data.online) return conn.reply(m.chat, `🚩 El servidor ${serverAddress} no está en línea.`, m);
+        if (!data || data.online === false) return conn.reply(m.chat, `🚩 El servidor ${serverAddress} no está en línea o no es válido.`, m);
 
         const { ip, port, players, motd, version, software, plugins } = data;
 
-        const motdText = motd ? motd.clean.join("\n") : "No disponible";
+        const motdText = motd?.clean ? motd.clean.join("\n") : "No disponible";
         const playersOnline = players ? `${players.online}/${players.max}` : "No disponible";
-        const pluginList = plugins ? plugins.names.join(", ") : "No especificado";
+        const pluginList = plugins?.names ? plugins.names.join(", ") : "No especificado";
         const softwareInfo = software || "No especificado";
         
         const message = `🌐 *Información del servidor de Minecraft: ${serverAddress}*
