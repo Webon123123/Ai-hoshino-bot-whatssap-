@@ -12,7 +12,7 @@ let handler = async (m, { conn, args }) => {
         const data = await response.json();
         if (!data || data.online === false) return conn.reply(m.chat, `🚩 El servidor ${serverAddress} no está en línea o no es válido.`, m);
 
-        const { ip, port, players, motd, version, software, plugins } = data;
+        const { ip, port, players, motd, version, software, plugins, icon } = data;
 
         const motdText = motd?.clean ? motd.clean.join("\n") : "No disponible";
         const playersOnline = players ? `${players.online}/${players.max}` : "No disponible";
@@ -29,8 +29,14 @@ let handler = async (m, { conn, args }) => {
 *Plugins*: ${pluginList}
 *Mensaje del día (MOTD)*:
 ${motdText}`;
+
+        if (icon) {
+            const iconBuffer = Buffer.from(icon.split(",")[1], 'base64');
+            await conn.sendMessage(m.chat, { image: iconBuffer, caption: message }, { quoted: m });
+        } else {
+            conn.reply(m.chat, message, m);
+        }
         
-        conn.reply(m.chat, message, m);
     } catch (error) {
         return conn.reply(m.chat, `🚩 Error: ${error.message}`, m);
     }
