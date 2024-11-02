@@ -1,24 +1,17 @@
-import fetch from 'node-fetch';
+import { randomInt } from 'crypto';
 
 let handler = async (m) => {
-    try {
-        const response = await fetch(`https://minecraft-api.com/api/random-world`);
-        if (!response.ok) throw new Error('No se pudo generar el mundo aleatorio.');
+    const seed = randomInt(-2147483648, 2147483647).toString(); 
+    const biome = 'Plains'; 
+    const coordinates = { x: randomInt(-1000, 1000), y: 64, z: randomInt(-1000, 1000) };
+    const features = ['Rivers', 'Mountains', 'Forests', 'Memo te amo']; 
+    let featuresList = features.join(', ');
 
-        const worldData = await response.json();
-
-        const { name, biome, coordinates, features } = worldData;
-
-        let featuresList = features.length > 0 ? features.join(', ') : 'Ninguna característica especial';
-        
-        await m.reply(`🌍 Mundo Generado: *${name}*\n\n🗺 Bioma: *${biome}*\n📍 Coordenadas: *X: ${coordinates.x}, Y: ${coordinates.y}, Z: ${coordinates.z}*\n✨ Características: ${featuresList}`);
-    } catch (error) {
-        await m.reply(`🚩 Error: ${error.message}`);
-    }
+    await m.reply(`🌍 Semilla generada: *${seed}*\n\n🗺 Bioma: *${biome}*\n📍 Coordenadas: *X: ${coordinates.x}, Y: ${coordinates.y}, Z: ${coordinates.z}*\n✨ Características: ${featuresList}`);
 };
 
-handler.help = ["randomworld"];
+handler.help = ["generarseed"];
 handler.tags = ['minecraft'];
-handler.command = /^(randomworld|mundoaleatorio|seed)$/i;
+handler.command = /^(generarseed|semilla|seed)$/i;
 
 export default handler;
