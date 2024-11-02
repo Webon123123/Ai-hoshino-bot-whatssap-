@@ -21,7 +21,7 @@ let handler = async (m, { conn, args }) => {
 
 handler.help = ["decrypt <texto>"];
 handler.tags = ['tools'];
-handler.command = /^(decrypt)$/i;
+handler.command = /^(decrypt|desencriptar)$/i;
 
 export default handler;
 
