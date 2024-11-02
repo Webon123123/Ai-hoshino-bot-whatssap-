@@ -14,7 +14,7 @@ let handler = async (m, { conn, args }) => {
             title, 
             description, 
             statistics, 
-            relationships
+            relationships = []
         } = mangaData.data.attributes;
 
         const translatedTitle = title['es'] || title['en'] || Object.values(title)[0];
@@ -24,10 +24,10 @@ let handler = async (m, { conn, args }) => {
         const chapters = mangaData.data.attributes.chapterCount || "No especificado";
         const volumes = mangaData.data.attributes.volumeCount || "No especificado";
 
-        const coverId = relationships.find(rel => rel.type === 'cover_art')?.id;
+        const coverRelation = relationships.find(rel => rel.type === 'cover_art');
         let coverUrl = "https://mangadex.org/images/placeholder.png";
-        if (coverId) {
-            coverUrl = `https://uploads.mangadex.org/covers/${mangaId}/${coverId}.256.jpg`;
+        if (coverRelation && coverRelation.id) {
+            coverUrl = `https://uploads.mangadex.org/covers/${mangaId}/${coverRelation.id}.256.jpg`;
         }
 
         const langQuery = await fetch(`https://api.mangadex.org/manga/${mangaId}/feed`);
@@ -62,7 +62,7 @@ let handler = async (m, { conn, args }) => {
 
 handler.help = ["infomanga <ID del manga>"];
 handler.tags = ['tools'];
-handler.command = /^(infomanga|mangainfo|infodex)$/i;
+handler.command = /^(infomanga)$/i;
 
 export default handler;
 
