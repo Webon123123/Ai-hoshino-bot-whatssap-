@@ -6,7 +6,7 @@ let handler = async (m, { conn, args }) => {
     const itemName = args[0].toLowerCase();
     
     try {
-        const response = await fetch(`https://www.minecraftcrafting.info/api/v1/recipes/${itemName}`);
+        const response = await fetch(`https://minecraft-api.com/api/recipe/${itemName}`);
         if (!response.ok) throw new Error('No se encontró la receta para este objeto.');
         
         const recipeData = await response.json();
@@ -14,7 +14,7 @@ let handler = async (m, { conn, args }) => {
             return conn.reply(m.chat, '🚩 No se encontró una receta válida para el objeto solicitado.', m);
         }
 
-      
+        
         await conn.sendMessage(m.chat, { 
             image: { url: recipeData.image }, 
             caption: `🧰 Receta para: *${recipeData.name}*\n\n📄 *Descripción*: ${recipeData.description}\n\n🛠 *Materiales necesarios*:\n${recipeData.materials.join(', ')}`
