@@ -10,15 +10,18 @@ let handler = async (m, { conn, args }) => {
         if (!response.ok) throw new Error('No se encontró la receta para este objeto.');
         
         const recipeData = await response.json();
-        if (!recipeData || recipeData.length === 0) {
+        
+        if (!recipeData || !recipeData.materials || recipeData.materials.length === 0) {
             return conn.reply(m.chat, '🚩 No se encontró una receta válida para el objeto solicitado.', m);
         }
 
         const { name, description, materials, image } = recipeData;
 
+        const materialsList = materials.map(material => `${material.name} x${material.amount}`).join('\n');
+
         await conn.sendMessage(m.chat, { 
             image: { url: image }, 
-            caption: `🧰 Receta para: *${name}*\n\n📄 *Descripción*: ${description}\n\n🛠 *Materiales necesarios*:\n${materials.join(', ')}`
+            caption: `🧰 Receta para: *${name}*\n\n📄 *Descripción*: ${description}\n\n🛠 *Materiales necesarios*:\n${materialsList}`
         }, { quoted: m });
     } catch (error) {
         await conn.reply(m.chat, `🚩 Error: ${error.message}`, m);
