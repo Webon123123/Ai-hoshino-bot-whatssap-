@@ -3,7 +3,7 @@ const { generateWAMessageContent, generateWAMessageFromContent, proto } = (await
 
 let animeSearchHandler = async (m, { conn, text }) => {
     if (!text) {
-        return m.reply('🚩 Por favor, ingresa el nombre del anime que deseas buscar.');
+        return m.reply('「 𝙸𝚗𝚐𝚛𝚎𝚜𝚊 𝚎𝚕 𝚗𝚘𝚖𝚋𝚛𝚎 𝚍𝚎𝚕 𝚊𝚗𝚒𝚖𝚎 𝚚𝚞𝚎 𝚍𝚎𝚜𝚎𝚊𝚜 𝚋𝚞𝚜𝚌𝚊𝚛 」');
     }
 
     try {
@@ -18,22 +18,22 @@ let animeSearchHandler = async (m, { conn, text }) => {
         const data = await response.json();
 
         if (!data.results || data.results.length === 0) {
-            return conn.reply(m.chat, '🚩 No se encontraron animes con ese nombre.', m);
+            return conn.reply(m.chat, '❝ 𝙽𝚘 𝚜𝚎 𝚎𝚗𝚌𝚘𝚗𝚝𝚛𝚊𝚛𝚘𝚗 𝚊𝚗𝚒𝚖𝚎𝚜 𝚌𝚘𝚗 𝚎𝚜𝚎 𝚗𝚘𝚖𝚋𝚛𝚎 ❞', m);
         }
 
         for (let anime of data.results) {
             const animeId = anime.id;
-            const animeTitle = anime.title || 'Título no disponible';
-            const animeScore = anime.score ? `⭐ **Rating**: ${anime.score}` : '⭐ **Rating**: No disponible';
+            const animeTitle = anime.title || '✧ 𝚃𝚒𝚝𝚞𝚕𝚘 𝚗𝚘 𝚍𝚒𝚜𝚙𝚘𝚗𝚒𝚋𝚕𝚎';
+            const animeScore = anime.score ? `⭒ 𝙿𝚞𝚗𝚝𝚞𝚊𝚌𝚒𝚘́𝚗: ${anime.score}` : '⭒ 𝙿𝚞𝚗𝚝𝚞𝚊𝚌𝚒𝚘́𝚗: 𝙽𝚘 𝚍𝚒𝚜𝚙𝚘𝚗𝚒𝚋𝚕𝚎';
             const animePoster = anime.poster || 'https://i.ibb.co/hcnfCQS/file.jpg';
             const imageMessage = await createImageMessage(animePoster);
 
             resultsArray.push({
                 body: proto.Message.InteractiveMessage.Body.fromObject({
-                    text: `✨🌌 **Título**: ${animeTitle}\n💫💖 ${animeScore} 💖💫`
+                    text: `✦ *𝚃𝚒𝚝𝚞𝚕𝚘*: ${animeTitle}\n${animeScore}`
                 }),
                 footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                    text: `🆔 **ID**: ${animeId}`
+                    text: `➤ *𝙸𝙳*: ${animeId}`
                 }),
                 header: proto.Message.InteractiveMessage.Header.fromObject({
                     title: '',
@@ -43,7 +43,7 @@ let animeSearchHandler = async (m, { conn, text }) => {
                 nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
                     buttons: [{
                         name: "cta_copy",
-                        buttonParamsJson: `{"display_text":"Copiar ID","id":"${animeId}","copy_code":"${animeId}"}`
+                        buttonParamsJson: `{"display_text":"✎ 𝙲𝚘𝚙𝚒𝚊𝚛 𝙸𝙳","id":"${animeId}","copy_code":"${animeId}"}`
                     }]
                 })
             });
@@ -58,10 +58,10 @@ let animeSearchHandler = async (m, { conn, text }) => {
                     },
                     interactiveMessage: proto.Message.InteractiveMessage.fromObject({
                         body: proto.Message.InteractiveMessage.Body.create({
-                            text: `✨✨✨ Resultados para: ${text} ✨✨✨`
+                            text: `「 𝚁𝚎𝚜𝚞𝚕𝚝𝚊𝚍𝚘𝚜 𝚙𝚊𝚛𝚊: ${text} 」`
                         }),
                         footer: proto.Message.InteractiveMessage.Footer.create({
-                            text: '🌌✨ Aquí están tus resultados. 🌌✨\n\n👤 ' + String.fromCharCode(77, 97, 115, 104, 97, 32, 79, 70, 67)
+                            text: '❝ 𝙷𝚎𝚖𝚘𝚜 𝚎𝚗𝚌𝚘𝚗𝚝𝚛𝚊𝚍𝚘 𝚕𝚘𝚜 𝚜𝚒𝚐𝚞𝚒𝚎𝚗𝚝𝚎𝚜 𝚛𝚎𝚜𝚞𝚕𝚝𝚊𝚍𝚘𝚜 ❞\n\n✧ 𝙲𝚛𝚎𝚊𝚍𝚘 𝚙𝚘𝚛 𝙼𝚊𝚜𝚑𝚊 𝙾𝙵𝙲'
                         }),
                         header: proto.Message.InteractiveMessage.Header.create({
                             hasMediaAttachment: false
@@ -78,11 +78,11 @@ let animeSearchHandler = async (m, { conn, text }) => {
 
     } catch (error) {
         console.error(error);
-        return conn.reply(m.chat, `🚩 Error: ${error.message}`, m);
+        return conn.reply(m.chat, `「 𝙴𝚛𝚛𝚘𝚛: ${error.message} 」`, m);
     }
 };
 
 animeSearchHandler.help = ["animesearch"];
 animeSearchHandler.tags = ["search"];
-animeSearchHandler.command = /^(searchanime|animeflv|animesearch|animeid)$/i;
+animeSearchHandler.command = /^(searchanime|animeflv|animesearch|animeid|animeflvbuscar|buscarnime|animebuscar)$/i;
 export default animeSearchHandler;
