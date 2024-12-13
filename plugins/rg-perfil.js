@@ -1,66 +1,101 @@
+import PhoneNumber from 'awesome-phonenumber';
+import fetch from 'node-fetch';
+import fs from 'fs';
 
-import { canLevelUp, xpRange } from '../lib/levelling.js'
-import { createHash } from 'crypto'
-import PhoneNumber from 'awesome-phonenumber'
-import fetch from 'node-fetch'
-import fs from 'fs'
+const loadMarriages = () => {
+    if (fs.existsSync('./storage/database/marry.json')) {
+        const data = JSON.parse(fs.readFileSync('./storage/database/marry.json', 'utf-8'));
+        global.db.data.marriages = data;
+    } else {
+        global.db.data.marriages = {};
+    }
+};
 
-let handler = async (m, { conn, usedPrefix, command}) => {
-  let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender
-  let bio = await conn.fetchStatus(who).catch(_ => 'undefined')
-  let biot = bio.status?.toString() || 'Sin Info'
-  let user = global.db.data.users[who]
-  let pp = await conn.profilePictureUrl(who, 'image').catch(_ => 'https://i.ibb.co/P4nbf7g/file.jpg')
-  let { exp, limit, name, registered, regTime, age, level } = global.db.data.users[who]
-  let { min, xp, max } = xpRange(user.level, global.multiplier)
-  let username = conn.getName(who)
-  let prem = global.prems.includes(who.split`@`[0])
-  let sn = createHash('md5').update(who).digest('hex')
-  let api = await axios.get(`https://deliriussapi-oficial.vercel.app/tools/country?text=${PhoneNumber('+' + who.replace('@s.whatsapp.net', '')).getNumber('international')}`)
-  let userNationalityData = api.data.result
-  let userNationality = userNationalityData ? `${userNationalityData.name} ${userNationalityData.emoji}` : 'Desconocido'
-  let img = await (await fetch(`${pp}`)).buffer()
-  let txt = ` –  *P E R F I L  -  U S E R*\n\n`
-      txt += `┌  ✩  *Nombre* : ${name}\n`
-      txt += `│  ✩  *Edad* : ${registered ? `${age} años` : '×'}\n`
-      txt += `│  ✩  *Numero* : ${PhoneNumber('+' + who.replace('@s.whatsapp.net', '')).getNumber('international')}\n`
-      txt += `│  ✩  *Nacionalidad* : ${userNationality}\n`
-      txt += `│  ✩  *Link* : wa.me/${who.split`@`[0]}\n`
-      txt += `│  ✩  *Estrellas* : ${limit}\n`
-      txt += `│  ✩  *Nivel* : ${level}\n`
-      txt += `│  ✩  *XP* : Total ${exp} (${user.exp - min}/${xp})\n`
-      txt += `│  ✩  *Premium* : ${prem ? 'Si' : 'No'}\n`
-      txt += `└  ✩  *Registrado* : ${registered ? 'Si': 'No'}`
-  let mentionedJid = [who]
-await conn.sendFile(m.chat, img, 'thumbnail.jpg', txt, m)
-}
-handler.help = ['perfil', 'perfil *@user*']
-handler.tags = ['rg']
-handler.command = /^(perfil|profile)$/i
-handler.register = true
-
-export default handler
-
-
-const more = String.fromCharCode(8206)
-const readMore = more.repeat(4001)
-
-function formatDate(n, locale = 'es-US') {
-  let d = new Date(n)
-  return d.toLocaleDateString(locale, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  })
+function toNum(number) {
+    if (number >= 1000 && number < 1000000) {
+        return (number / 1000).toFixed(1) + 'k';
+    } else if (number >= 1000000) {
+        return (number / 1000000).toFixed(1) + 'M';
+    } else if (number <= -1000 && number > -1000000) {
+        return (number / 1000).toFixed(1) + 'k';
+    } else if (number <= -1000000) {
+        return (number / 1000000).toFixed(1) + 'M';
+    } else {
+        return number.toString();
+    }
 }
 
-function formatHour(n, locale = 'en-US') {
-  let d = new Date(n)
-  return d.toLocaleString(locale, {
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true
-  })
+var handler = async (m, { conn }) => {
+    loadMarriages();
+    
+    let who;
+    if (m.quoted && m.quoted.sender) {
+        who = m.quoted.sender;
+    } else {
+        who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender;
+    }
+
+    let pp = await conn.profilePictureUrl(who, 'image').catch(_ => imagen1);
+    let { premium, level, genre, birth, description, stars, exp, lastclaim, registered, regTime, age, role } = global.db.data.users[who] || {};
+    let username = conn.getName(who);
+
+    genre = genre === 0 ? 'No especificado' : genre || 'No especificado';
+    age = registered ? (age || 'Desconocido') : 'Sin especificar';
+    birth = birth || 'No Establecido';
+    description = description || 'Sin Descripción';
+    role = role || 'Aldeano';
+
+    let isMarried = who in global.db.data.marriages;
+    let partner = isMarried ? global.db.data.marriages[who] : null;
+    let partnerName = partner ? conn.getName(partner) : 'Nadie';
+    let api = await axios.get(`https://deliriussapi-oficial.vercel.app/tools/country?text=${PhoneNumber('+' + who.replace('@s.whatsapp.net', '')).getNumber('international')}`);
+    let userNationalityData = api.data.result;
+    let userNationality = userNationalityData ? `${userNationalityData.name} ${userNationalityData.emoji}` : 'Desconocido';
+    
+    let noprem = `
+╭─── *👤 PERFIL DE USUARIO* ────╮
+☁️ *Nombre:* ${username}
+💠 *Edad:* ${age}
+⚧️ *Género:* ${genre}
+🎂 *Cumpleaños:* ${birth} 
+👩‍❤️‍👩 *Casad@:* ${isMarried ? partnerName : 'Nadie'}
+📜 *Descripción:* ${description}
+🌀 *Registrado:* ${registered ? '✅' : '❌'}
+🌐 *País:* ${userNationality}
+
+╭─── *💰 RECURSOS* ───╮
+✩ *Stars:* ${toNum(stars || 0)}
+🌟 *Nivel:* ${level || 0}
+✨ *Experiencia:* ${exp || 0}
+⚜️ *Rango:* ${role}
+👑 *Premium:* ${premium ? '✅' : '❌'}
+╰──────────────────╯`.trim();
+
+    let prem = `
+╭─── *🌟 USUARIO PREMIUM* ────╮
+👤 *Nombre:* ${username}
+💠 *Edad:* ${age}
+⚧️ *Género:* ${genre}
+🎂 *Cumpleaños:* ${birth}
+👩‍❤️‍👩 *Casad@:* ${isMarried ? partnerName : 'Nadie'}
+📜 *Descripción:* ${description}
+🌀 *Registrado:* ${registered ? '✅' : '❌'}
+🌐 *País:* ${userNationality}
+
+╭─── *💰 RECURSOS* ───╮
+✩ *Stars:* ${toNum(stars || 0)}
+🌟 *Nivel:* ${level || 0}
+✨ *Experiencia:* ${exp || 0}
+⚜️ *Rango:* ${role}
+╰──────────────────╯`.trim();
+
+    conn.sendFile(m.chat, pp, 'perfil.jpg', `${premium ? prem : noprem}`, m, { mentions: [who] });
 }
+
+handler.help = ['profile'];
+handler.register = true;
+handler.group = true;
+handler.tags = ['rg'];
+handler.command = ['profile', 'perfil'];
+
+export default handler;

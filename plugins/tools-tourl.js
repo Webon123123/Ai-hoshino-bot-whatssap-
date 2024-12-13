@@ -1,44 +1,70 @@
-import uploadFile from '../lib/uploadFile.js'
-import uploadImage from '../lib/uploadImage.js'
-import fetch from 'node-fetch'
+import fetch from "node-fetch";
+import crypto from "crypto";
+import { FormData, Blob } from "formdata-node";
+import { fileTypeFromBuffer } from "file-type";
 
-let handler = async (m) => {
-  let q = m.quoted ? m.quoted : m
-  let mime = (q.msg || q).mimetype || ''
-  if (!mime) return conn.reply(m.chat, '🚩 Responde a una *Imagen* o *Vídeo.*', m)
-  await m.react('🕓')
-  try {
-  let media = await q.download()
-  let isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime)
-  let link = await (isTele ? uploadImage : uploadFile)(media)
-  let img = await (await fetch(`${link}`)).buffer()
-  let txt = `*乂  T E L E G R A P H  -  U P L O A D E R*\n\n`
-      txt += `  *» Enlace* : ${link}\n`
-      txt += `  *» Acortado* : ${await shortUrl(link)}\n`
-      txt += `  *» Tamaño* : ${formatBytes(media.length)}\n`
-      txt += `  *» Expiración* : ${isTele ? 'No expira' : 'Desconocido'}\n\n`
-      txt += `🚩 *${textbot}*`
+const handler = async (m, { conn }) => {
+let q = m.quoted ? m.quoted : m;
+  let mime = (q.msg || q).mimetype || "";
+  if (!mime) return m.reply("🌹 *_Atención: Para continuar, es necesario que envíes una imagen, vídeo, audio o gif. Por favor, asegúrate de hacerlo antes de utilizar el comando nuevamente. ¡Gracias!_*", null, { quoted: fkontak });
+  let media = await q.download();
+let link = await catbox(media);
+  let caption = `🔗 *L I N K DE ACCESO :*
+ \`\`\`• ${link}\`\`\`
+📊 *T A M A Ñ O DEL ARCHIVO :* ${formatBytes(media.length)}
+📅 *V A L I D E Z DEL ENLACE :* *"Sin fecha de caducidad"* 
+`;
 
-await conn.sendFile(m.chat, img, 'thumbnail.jpg', txt, m, null)
-await m.react('✅')
-} catch {
-await m.react('✖️')
-}}
+  await m.reply(caption);
+}
+handler.command = ['tourl','upload']
 handler.help = ['tourl']
-handler.tags = ['tools']
-handler.command = /^(tourl|upload)$/i
+handler.tags = ['transformador']
+//handler.stars = 5
 export default handler
+
 
 function formatBytes(bytes) {
   if (bytes === 0) {
-    return '0 B';
+    return "0 B";
   }
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
   return `${(bytes / 1024 ** i).toFixed(2)} ${sizes[i]}`;
 }
 
-async function shortUrl(url) {
-	let res = await fetch(`https://tinyurl.com/api-create.php?url=${url}`)
-	return await res.text()
+
+/**
+ * Upload image to catbox
+ * Supported mimetype:
+ * - `image/jpeg`
+ * - `image/jpg`
+ * - `image/png`s
+ * - `image/webp`
+ * - `video/mp4`
+ * - `video/gif`
+ * - `audio/mpeg`
+ * - `audio/opus`
+ * - `audio/mpa`
+ * @param {Buffer} buffer Image Buffer
+ * @return {Promise<string>}
+ */
+async function catbox(content) {
+  const { ext, mime } = (await fileTypeFromBuffer(content)) || {};
+  const blob = new Blob([content.toArrayBuffer()], { type: mime });
+  const formData = new FormData();
+  const randomBytes = crypto.randomBytes(5).toString("hex");
+  formData.append("reqtype", "fileupload");
+  formData.append("fileToUpload", blob, randomBytes + "." + ext);
+
+  const response = await fetch("https://catbox.moe/user/api.php", {
+    method: "POST",
+    body: formData,
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
+    },
+  });
+
+  return await response.text();
 }
