@@ -1,5 +1,5 @@
 /* 
-  Joan estubo aquí:v joan gei
+  Joan estubo aquí:v
 
   TK-Host
   *🤖 Consigue tu propio Bot de WhatsApp con TK-HOST 🤖*  
